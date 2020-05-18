@@ -79,7 +79,7 @@ final class TransactionalOperatorImpl implements TransactionalOperator {
 			// Need re-wrapping of ReactiveTransaction until we get hold of the exception
 			// through usingWhen.
 			return status.flatMap(it -> Mono.usingWhen(Mono.just(it), ignore -> mono,
-					this.transactionManager::commit, (res, err) -> Mono.empty(), this.transactionManager::commit)
+					this.transactionManager::commit, (res, err) -> Mono.empty(), this.transactionManager::rollback)
 					.onErrorResume(ex -> rollbackOnException(it, ex).then(Mono.error(ex))));
 		})
 		.subscriberContext(TransactionContextManager.getOrCreateContext())
